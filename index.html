@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Form</title>
+</head>
+<body>
+    <h1>File Upload Form</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div id="fileFields">
+            <input type="file" name="files" multiple><br>
+        </div>
+    
+
+        <!-- Input fields for keys -->
+        <div id="keyFields">
+            <input type="text" name="keys[]" placeholder="Key 1"><br>
+        </div>
+        <button type="button" onclick="addFileField()">Add File</button><br>
+        <button type="button" onclick="addKeyField()">Add Key</button><br>
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+
+        function addFileField() {
+            const fileFields = document.getElementById('fileFields');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.name = 'files';
+            input.multiple = true;
+            fileFields.appendChild(input);
+            fileFields.appendChild(document.createElement('br'));
+        }
+
+
+        function addKeyField() {
+            const keyFields = document.getElementById('keyFields');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'keys[]';
+            input.placeholder = 'Key ' + (keyFields.children.length + 1);
+            keyFields.appendChild(input);
+        }
+
+        function submitForm() {
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData();
+
+            // Append files with 'files' key
+            const filesInput = document.querySelector('input[name="files"]');
+            for (const file of filesInput.files) {
+                formData.append('files', file);
+            }
+
+            // Append keys with 'keys' key
+            const keyInputs = document.querySelectorAll('input[name="keys[]"]');
+            for (const keyInput of keyInputs) {
+                formData.append('keys', keyInput.value);
+            }
+
+            // Specify your API IP address
+            const apiUrl = 'http://10.1.75.95:5000/process';
+
+
+            // Display 'Getting response...' while waiting for the response
+            document.getElementById('response').innerText = 'Getting response...';
+
+            fetch('http://10.1.75.95:5000/process', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display response in the 'response' div
+                document.getElementById('response').innerHTML = JSON.stringify(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
